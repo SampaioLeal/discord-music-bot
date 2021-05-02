@@ -1,6 +1,6 @@
 # NodeTS
 
-A NodeJS Typescript templat for building beautiful applications
+A NodeJS Typescript template for building beautiful applications
 
 ## Installation
 
