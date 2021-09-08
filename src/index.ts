@@ -10,3 +10,7 @@ const object: GenericType = {
 
 console.log(object);
 console.log('Start developing your NodeTS application');
+console.log(false ?? 'Test');
+console.log(undefined ?? 'Test');
+console.log(null ?? 'Test');
+console.log(NaN ?? 'Test');
