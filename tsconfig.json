@@ -11,6 +11,11 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["src/utils/*"],
+      "@logger/*": ["src/logger/index"]
+    },
     "forceConsistentCasingInFileNames": true
   }
 }

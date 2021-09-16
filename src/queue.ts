@@ -3,71 +3,71 @@ import {
   createAudioPlayer,
   createAudioResource,
   getVoiceConnection,
-  NoSubscriberBehavior,
-} from '@discordjs/voice';
-import { Readable } from 'stream';
-import ytdl from 'ytdl-core';
+  NoSubscriberBehavior
+} from '@discordjs/voice'
+import { Readable } from 'stream'
+import ytdl from 'ytdl-core'
 
 interface QueueOptions {
-  guildId: string;
-  channelId: string;
+  guildId: string
+  channelId: string
 }
 
 interface Song {
-  name: string;
-  url: string;
+  name: string
+  url: string
 }
 
 export class Queue {
-  guildId: string;
-  channelId: string;
-  songs: { name: string; url: string }[];
-  playing: boolean;
-  player: AudioPlayer;
-  stream: Readable | null;
+  guildId: string
+  channelId: string
+  songs: { name: string; url: string }[]
+  playing: boolean
+  player: AudioPlayer
+  stream: Readable | null
 
   constructor(options: QueueOptions) {
-    this.stream = null;
-    this.songs = [];
-    this.playing = false;
+    this.stream = null
+    this.songs = []
+    this.playing = false
     this.player = createAudioPlayer({
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause,
-      },
-    });
+        noSubscriber: NoSubscriberBehavior.Pause
+      }
+    })
 
     this.player.on('stateChange', (oldState, newState) => {
       if (oldState.status === 'playing' && newState.status === 'idle') {
-        this.skip();
+        this.skip()
       }
-    });
+    })
 
-    this.guildId = options.guildId;
-    this.channelId = options.channelId;
+    this.guildId = options.guildId
+    this.channelId = options.channelId
   }
 
   get currentSong() {
-    return this.songs[0];
+    return this.songs[0]
   }
 
   push(song: Song) {
-    this.songs.push(song);
+    this.songs.push(song)
   }
 
   skip() {
-    this.stream?.destroy();
-    this.player.stop();
-    this.songs.shift();
+    this.stream?.destroy()
+    this.player.stop()
+    this.songs.shift()
 
-    this.playing = false;
-    this.stream = null;
+    this.playing = false
+    this.stream = null
 
-    this.play();
+    this.play()
   }
 
   disconnect() {
-    const connection = getVoiceConnection(this.guildId);
-    connection?.destroy();
+    const connection = getVoiceConnection(this.guildId)
+    connection?.destroy()
   }
 
   // TODO: enviar mensagem de join: ":thumbsup: Joined g10 and bound to #canal"
@@ -75,26 +75,26 @@ export class Queue {
   play() {
     if (!this.playing) {
       if (this.songs.length) {
-        const stream = ytdl(this.currentSong.url, { filter: 'audioonly' });
-        const resource = createAudioResource(stream);
+        const stream = ytdl(this.currentSong.url, { filter: 'audioonly' })
+        const resource = createAudioResource(stream)
 
-        this.stream = stream;
-        this.player.play(resource);
+        this.stream = stream
+        this.player.play(resource)
 
-        this.playing = true;
+        this.playing = true
 
         stream.once('error', () => {
-          this.skip();
-        });
+          this.skip()
+        })
       } else {
-        console.log('Queue is empty!');
+        console.log('Queue is empty!')
       }
     } else {
-      this.player.unpause();
+      this.player.unpause()
     }
   }
 
   pause() {
-    this.player.pause();
+    this.player.pause()
   }
 }
