@@ -36,6 +36,12 @@ export class Queue {
       },
     });
 
+    this.player.on('stateChange', (oldState, newState) => {
+      if (oldState.status === 'playing' && newState.status === 'idle') {
+        this.skip();
+      }
+    });
+
     this.guildId = options.guildId;
     this.channelId = options.channelId;
   }
@@ -46,7 +52,6 @@ export class Queue {
 
   push(song: Song) {
     this.songs.push(song);
-    if (!this.playing) this.play();
   }
 
   skip() {
@@ -68,24 +73,28 @@ export class Queue {
   // TODO: enviar mensagem de join: ":thumbsup: Joined g10 and bound to #canal"
   // TODO: enviar mensagem de tocando musga: "Playing :notes: Cristiano Ronaldo "Ambição" - Now!"
   play() {
-    if (!this.playing && this.songs.length) {
-      const stream = ytdl(this.currentSong.url, { filter: 'audioonly' });
-      const resource = createAudioResource(stream);
+    if (!this.playing) {
+      if (this.songs.length) {
+        const stream = ytdl(this.currentSong.url, { filter: 'audioonly' });
+        const resource = createAudioResource(stream);
 
-      this.stream = stream;
-      this.player.play(resource);
+        this.stream = stream;
+        this.player.play(resource);
 
-      this.player.once('stateChange', (oldState, newState) => {
-        if (oldState.status === 'playing' && newState.status === 'idle') {
+        this.playing = true;
+
+        stream.once('error', () => {
           this.skip();
-        }
-      });
-
-      this.playing = true;
-
-      stream.once('error', () => {
-        this.skip();
-      });
+        });
+      } else {
+        console.log('Queue is empty!');
+      }
+    } else {
+      this.player.unpause();
     }
+  }
+
+  pause() {
+    this.player.pause();
   }
 }

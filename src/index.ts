@@ -32,7 +32,8 @@ client.on('messageCreate', async (message) => {
 
   if (message.guild) {
     const command = getCommand(message, prefix);
-    const requestedVideo = message.content.replace(prefix + command + ' ', '');
+    // TODO: change to args
+    const requestedVideo = message.content.replace(prefix + command, '').trim();
     const userVoiceChannel = message.member?.voice.channel;
     let queue = queues.get(message.guild.id);
 
@@ -69,11 +70,20 @@ client.on('messageCreate', async (message) => {
 
     switch (command) {
       case 'play':
-        queue!.push({ name: 'Musica', url: requestedVideo });
+        console.log(requestedVideo);
+        if (requestedVideo)
+          queue!.push({ name: 'Musica', url: requestedVideo });
+        queue!.play();
         break;
+
+      case 'pause':
+        queue!.pause();
+        break;
+
       case 'skip':
         queue!.skip();
         break;
+
       case 'dc':
         queue!.disconnect();
         queues.delete(message.guild.id);
