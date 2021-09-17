@@ -13,8 +13,11 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@app/*": ["src/app/*"],
       "@utils/*": ["src/utils/*"],
-      "@logger/*": ["src/logger/index"]
+      "@enums/*": ["src/enums/*"],
+      "@typings/*": ["src/typings/*"],
+      "@logger": ["src/logger/index"]
     },
     "forceConsistentCasingInFileNames": true
   }

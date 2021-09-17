@@ -28,9 +28,10 @@ const colors = {
 
 export class Logger {
   private logger: winston.Logger
+  private context: string
   private readonly formatPadLogger = false
 
-  constructor() {
+  constructor(context?: string) {
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
@@ -40,6 +41,7 @@ export class Logger {
       ],
       exitOnError: false
     })
+    this.context = context || '-'
   }
 
   private consoleFormat() {
@@ -49,6 +51,7 @@ export class Logger {
       const buildMessage: string[] = []
       buildMessage.push(this.formatText('grey', formatTime, 0))
       buildMessage.push(this.formatText(tempLevel, tempLevel, 5))
+      buildMessage.push(this.formatText('yellow', this.context, 15))
       buildMessage.push('::')
       buildMessage.push(`${this.formatText(tempLevel, message, 0)}`)
       return buildMessage.join(' ')
