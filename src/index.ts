@@ -1,10 +1,10 @@
 import 'dotenv/config'
-import './utils/module-alias'
-import Client from '@app/client'
-import Commands from '@app/commands'
+import './app/utils/module-alias.util'
+import ClientService from '@app/services/client.service'
+import CommandsService from '@app/services/commands.service'
 
-const client = new Client()
-const commands = new Commands()
+const client = new ClientService()
+const commands = new CommandsService()
 
 process.on('unhandledRejection', (error) => {
   console.error('Unhandled promise rejection:', error)

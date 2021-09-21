@@ -1,4 +1,4 @@
-import AbstractCommand from '@app/commandStrategy/abstractCommand'
+import AbstractCommand from '@app/services/commands/abstract-command.strategy'
 import { Message } from 'discord.js'
 
 class ForceSkipStrategy extends AbstractCommand {

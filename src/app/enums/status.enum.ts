@@ -1,4 +1,4 @@
-export enum Status {
+export enum StatusEnum {
   IDLE,
   PLAYING,
   MUSIC_PAUSED,

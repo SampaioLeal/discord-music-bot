@@ -2,9 +2,9 @@ import * as Discord from 'discord.js'
 import { Logger } from '@logger'
 import { ClientEvents } from 'discord.js'
 
-class Client {
+class ClientService {
   private client: Discord.Client
-  private logger = new Logger(Client.name)
+  private logger = new Logger(ClientService.name)
   private botIsReady = false
   private readonly DISCORD_TOKEN = process.env.DISCORD_TOKEN as string
 
@@ -32,6 +32,10 @@ class Client {
     this.client.on('debug', (error) => {
       this.logger.verbose(error)
     })
+
+    this.client.on('shardError', (error) => {
+      this.logger.error('A websocket connection encountered an error:', error)
+    })
   }
 
   addEventOn<KEYS extends keyof Discord.ClientEvents>(
@@ -39,14 +43,6 @@ class Client {
     cb: (...args: ClientEvents[KEYS]) => void
   ) {
     this.client.on(event, cb)
-  }
-
-  getClient() {
-    return this.client
-  }
-
-  isReady() {
-    return this.botIsReady
   }
 
   login(cb?: () => void) {
@@ -59,4 +55,4 @@ class Client {
   }
 }
 
-export default Client
+export default ClientService

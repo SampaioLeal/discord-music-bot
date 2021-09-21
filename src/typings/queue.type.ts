@@ -4,6 +4,7 @@ export interface SongData {
   duration: number
   userRequestName: string
   imageUrl: string
+  source: 'youtube' | 'spotify'
 }
 
 export interface CurrentSongData extends SongData {

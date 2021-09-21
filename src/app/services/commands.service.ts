@@ -1,16 +1,20 @@
 import { Message } from 'discord.js'
 import { Logger } from '@logger'
-import AbstractCommand from '@app/commandStrategy/abstractCommand'
-import { Undefined } from '@typings/genericTypes'
-import PlayStrategy from '@app/commandStrategy/playStrategy'
-import JoinStrategy from '@app/commandStrategy/joinStrategy'
-import NowPlayingStrategy from '@app/commandStrategy/nowPlayingStrategy'
-import ForceSkipStrategy from '@app/commandStrategy/forceSkipStrategy'
-import PauseStrategy from '@app/commandStrategy/pauseStrategy'
-import ResumeStrategy from '@app/commandStrategy/resumeStrategy'
+import AbstractCommand from '@app/services/commands/abstract-command.strategy'
+import { Undefined } from '@typings/generic.type'
+import PlayStrategy from '@app/services/commands/play.strategy'
+import JoinStrategy from '@app/services/commands/join.strategy'
+import NowPlayingStrategy from '@app/services/commands/now-playing.strategy'
+import ForceSkipStrategy from '@app/services/commands/force-skip.strategy'
+import PauseStrategy from '@app/services/commands/pause.strategy'
+import ResumeStrategy from '@app/services/commands/resume.strategy'
+import DisconnectStrategy from '@app/services/commands/disconnect.strategy'
+import QueueStrategy from '@app/services/commands/queue.strategy'
+import ClearStrategy from '@app/services/commands/clear.strategy'
+import BomDiaStrategy from '@app/services/commands/bom-dia.strategy'
 
-class Commands {
-  private logger = new Logger(Commands.name)
+class CommandsService {
+  private logger = new Logger(CommandsService.name)
   private command: Undefined<AbstractCommand>
   private prefix = process.env.BOT_DEFAULT_PREFIX as string
 
@@ -54,7 +58,11 @@ class Commands {
       np: new NowPlayingStrategy(),
       fs: new ForceSkipStrategy(),
       pause: new PauseStrategy(),
-      resume: new ResumeStrategy()
+      resume: new ResumeStrategy(),
+      dc: new DisconnectStrategy(),
+      q: new QueueStrategy(),
+      clear: new ClearStrategy(),
+      bomDia: new BomDiaStrategy()
     }
 
     if (commands[command]) {
@@ -81,4 +89,4 @@ class Commands {
   }
 }
 
-export default Commands
+export default CommandsService

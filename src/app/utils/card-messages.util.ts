@@ -1,7 +1,7 @@
 import { MessageEmbedOptions } from 'discord.js'
-import { CardMusic } from '@typings/cardMessageTypes'
-import { CurrentSongData } from '@typings/queue'
-import { secondsToDisplayTime } from '@utils/converts'
+import { CardMusic } from '@typings/card-message.type'
+import { CurrentSongData, SongData } from '@typings/queue.type'
+import { secondsToDisplayTime } from './converts.util'
 
 const makeCardMusic = (data: CardMusic) => {
   const logMessage: MessageEmbedOptions = {
@@ -68,9 +68,65 @@ const makeCardNowPlaying = (data: CurrentSongData) => {
   return logMessage
 }
 
+const makeCardSongList = (data: SongData[], page = 0) => {
+  console.log('page', page, 'lenght', data.length)
+  const pageSize = 10
+  const description: string[] = [buildMusicDetail(data[0])]
+  const amountPage = Math.ceil((data.length - 1) / pageSize)
+  const amountSong = data.length
+  const totalTimeOfSong = data.reduce((sum, song) => sum + song.duration, 0)
+  if (page + 1 > amountPage) page = amountPage - 1
+
+  data.shift()
+  data.splice(page * pageSize, pageSize).forEach((song, index) => {
+    description.push(buildMusicDetail(song, index))
+  })
+
+  description.push(
+    `${amountSong} músicas na fila :: total ${secondsToDisplayTime(
+      totalTimeOfSong
+    )}`
+  )
+
+  const logMessage: MessageEmbedOptions = {
+    title: 'Lista de músicas',
+    color: '#d4cc16',
+    author: {
+      name: 'Tocando agora'
+    },
+    description: buildDescription(description),
+    footer: {
+      text: `Página ${page + 1}/${amountPage}`
+    }
+  }
+
+  return logMessage
+}
+
 const buildDescription = (descriptions: string[], breakCount = 2) => {
   const breaker = new Array(breakCount).fill('\n').join('')
   return descriptions.join(breaker)
+}
+
+const buildMusicDetail = (song: SongData, index?: number) => {
+  const buildDescription: string[] = []
+  if (index !== undefined) {
+    if (index === 0) {
+      buildDescription.push('Na fila:\n')
+    }
+    buildDescription.push(`\`${index + 1}.\``)
+  } else {
+    buildDescription.push('Tocando agora:\n')
+  }
+  buildDescription.push(`[${song.name}](${song.url})`)
+  buildDescription.push(' :: ')
+  buildDescription.push('')
+  buildDescription.push(
+    `\`${secondsToDisplayTime(song.duration)} Adicionado por: ${
+      song.userRequestName
+    }\``
+  )
+  return buildDescription.join('')
 }
 
 const buildProgressBar = (currentTime: number, endTime: number) => {
@@ -87,4 +143,4 @@ const buildProgressBar = (currentTime: number, endTime: number) => {
   return progressBar.join('')
 }
 
-export { makeCardMusic, makeCardNowPlaying }
+export { makeCardMusic, makeCardNowPlaying, makeCardSongList }

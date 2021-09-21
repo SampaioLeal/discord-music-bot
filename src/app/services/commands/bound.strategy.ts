@@ -1,8 +1,8 @@
-import AbstractCommand from '@app/commandStrategy/abstractCommand'
+import AbstractCommand from '@app/services/commands/abstract-command.strategy'
 import { Message } from 'discord.js'
 
 class BoundStrategy extends AbstractCommand {
-  processMessage(message: Message): void {
+  async processMessage(message: Message) {
     console.log(message.channel)
   }
 }

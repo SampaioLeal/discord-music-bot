@@ -1,24 +1,19 @@
-import AbstractCommand from '@app/commandStrategy/abstractCommand'
 import { Message } from 'discord.js'
-import { Logger } from '@logger'
 import ytdl from 'ytdl-core'
+import { makeCardMusic } from '@app/utils/card-messages.util'
 import ytsr from 'ytsr'
-import { makeCardMusic } from '@utils/cardMessages'
+import { Logger } from '@logger'
+import QueueService from '@app/services/queue.service'
 
-class PlayStrategy extends AbstractCommand {
-  private logger = new Logger(PlayStrategy.name)
+class PlayMusicService {
+  private logger = new Logger(PlayMusicService.name)
+  private queue = QueueService.getInstance()
 
-  async processMessage(message: Message) {
-    this.joinChannel(message)
-    const result = await this.getYoutubeUrl(message.content)
-
-    if (!result) {
-      message.channel.send('`Não foi possivel encontrar referencias`')
-      return
-    }
-    const { url, search } = result
-    message.channel.send(`:musical_note: Pesquisando :mag_right: \`${search}\``)
-
+  async playMusic(
+    search: string,
+    url: string,
+    author: Message['author']
+  ): Promise<Parameters<Message['channel']['send']>['0']> {
     const videoInfo = (await ytdl.getBasicInfo(url)).videoDetails
     const videoTitle = videoInfo.title
     const videoChannel = videoInfo.author.name
@@ -27,29 +22,30 @@ class PlayStrategy extends AbstractCommand {
     const logMessage = makeCardMusic({
       title: videoTitle,
       musicUrl: url,
-      positionInQueue: this.getQueue().getListSong().length + 1,
+      positionInQueue: this.queue.getListSong().length + 1,
       timeUntilPlaying: 0,
       songDuration: videoLengthSeconds,
       youtubeChannelName: videoChannel,
       imageUrl: videoInfo.thumbnails[0].url,
-      authorIconUrl: message.author.avatarURL({ size: 32 })
+      authorIconUrl: author.avatarURL({ size: 32 })
     })
 
-    message.channel.send({
-      embeds: [logMessage]
-    })
-
-    this.getQueue().addSong({
+    this.queue.addSong({
       url: url,
       name: videoInfo.title,
       duration: videoLengthSeconds,
-      userRequestName: message.author.username,
-      imageUrl: videoInfo.thumbnails[0].url
+      userRequestName: author.username,
+      imageUrl: videoInfo.thumbnails[0].url,
+      source: 'youtube'
     })
-    this.getQueue().play()
+    this.queue.play()
+
+    return {
+      embeds: [logMessage]
+    }
   }
 
-  private async getYoutubeUrl(text: string) {
+  async getYoutubeUrl(text: string) {
     const searchWordOrLink = text.split(/\s(.+)/)[1]
     this.logger.info(`Buscando por ${searchWordOrLink}`)
 
@@ -87,4 +83,4 @@ class PlayStrategy extends AbstractCommand {
   }
 }
 
-export default PlayStrategy
+export default PlayMusicService

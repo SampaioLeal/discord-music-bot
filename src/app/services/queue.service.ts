@@ -7,24 +7,25 @@ import {
 } from '@discordjs/voice'
 import { Readable } from 'stream'
 import ytdl from 'ytdl-core'
-import { CurrentSongData, SongData } from '@typings/queue'
-import { Undefined } from '@typings/genericTypes'
-import { Status } from '@enums/status'
+import { CurrentSongData, SongData } from '@typings/queue.type'
+import { Null, Undefined } from '@typings/generic.type'
+import { StatusEnum } from '@app/enums/status.enum'
 import { Logger } from '@logger'
 
-class Queue {
-  private static instance: Queue
-  private logger = new Logger(Queue.name)
+class QueueService {
+  private static instance: QueueService
+  private logger = new Logger(QueueService.name)
 
   private songs: SongData[]
   private player: AudioPlayer
-  private stream: Readable | null
+  private stream: Null<Readable>
   private voiceChannel: Undefined<VoiceConnection>
-  private status: Status
+  private status: StatusEnum
   private elapsedTime = 0
+  private timeCounter: Undefined<NodeJS.Timer>
 
   private constructor() {
-    this.status = Status.IDLE
+    this.status = StatusEnum.IDLE
     this.stream = null
     this.songs = []
     this.player = createAudioPlayer({
@@ -41,17 +42,17 @@ class Queue {
   }
 
   public static getInstance() {
-    if (!Queue.instance) {
-      Queue.instance = new Queue()
+    if (!QueueService.instance) {
+      QueueService.instance = new QueueService()
     }
-    return Queue.instance
+    return QueueService.instance
   }
 
   public getStatus() {
     return this.status
   }
 
-  public setStatus(status: Status) {
+  public setStatus(status: StatusEnum) {
     this.status = status
   }
 
@@ -61,7 +62,14 @@ class Queue {
   }
 
   public disconnectVoice() {
+    this.clearSongList()
+    this.stop()
     if (this.voiceChannel) return this.voiceChannel.disconnect()
+    this.status = StatusEnum.IDLE
+  }
+
+  public clearSongList() {
+    this.songs = []
   }
 
   public getCurrentSong(): CurrentSongData {
@@ -82,57 +90,71 @@ class Queue {
 
   skip() {
     this.logger.info('Pulando para a proxima música')
-    this.stream?.destroy()
-    this.player.stop()
+    this.stop()
     this.songs.shift()
 
-    this.status = Status.WAITING_MUSIC
+    this.status = StatusEnum.WAITING_MUSIC
     this.stream = null
 
     this.play()
   }
 
   play() {
-    if (this.status === Status.MUSIC_PAUSED) {
-      this.status = Status.PLAYING
-      this.player.unpause()
-      return
-    }
-    if (this.status !== Status.PLAYING) {
+    if (this.status !== StatusEnum.PLAYING) {
       if (this.songs.length) {
-        this.elapsedTime = 0
+        this.resetTime()
         const currentSong = this.songs[0]
-        const stream = ytdl(currentSong.url, { filter: 'audioonly' })
+        const stream = ytdl(currentSong.url, {
+          filter: 'audioonly',
+          quality: 'highestaudio',
+          highWaterMark: 1048576 * 32
+        })
         const resource = createAudioResource(stream)
 
         this.stream = stream
         this.player.play(resource)
-        this.status = Status.PLAYING
-        const interval = setInterval(() => {
+        this.status = StatusEnum.PLAYING
+        this.timeCounter = setInterval(() => {
           if (currentSong.duration > this.elapsedTime) {
             this.elapsedTime++
           }
         }, 1000)
 
         stream.once('error', (d) => {
-          clearInterval(interval)
+          this.logger.error(d, d.stack)
+          this.resetTime()
           this.skip()
         })
       } else {
-        this.logger.info('Queue is empty!')
+        this.logger.info('A fila está vazia!')
       }
     }
   }
 
+  stop() {
+    this.status = StatusEnum.WAITING_MUSIC
+    this.stream?.destroy()
+    this.player.stop()
+  }
+
   pause() {
-    this.status = Status.MUSIC_PAUSED
+    this.status = StatusEnum.MUSIC_PAUSED
     this.player.pause()
   }
 
   resume() {
-    this.status = Status.PLAYING
+    this.status = StatusEnum.PLAYING
     this.player.unpause()
+  }
+
+  clearSongInQueue() {
+    this.songs.splice(1)
+  }
+
+  private resetTime() {
+    this.elapsedTime = 0
+    if (this.timeCounter) clearInterval(this.timeCounter)
   }
 }
 
-export default Queue
+export default QueueService
