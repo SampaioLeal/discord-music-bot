@@ -3,13 +3,15 @@ import { StatusEnum } from '@app/enums/status.enum'
 import { joinVoiceChannel } from '@discordjs/voice'
 import { Logger } from '@logger'
 import QueueService from '@app/services/queue.service'
+import { Null } from '@typings/generic.type'
 
 class ChannelService {
   private logger = new Logger(ChannelService.name)
-  private queue = QueueService.getInstance()
+  private queue: Null<QueueService> = null
 
   joinChannel(message: Message) {
-    if (this.queue.getStatus() !== StatusEnum.IDLE) {
+    const queue = this.getQueueOrThrow()
+    if (queue.getStatus() !== StatusEnum.IDLE) {
       this.logger.warn('Já está em um canal')
       return
     }
@@ -18,9 +20,9 @@ class ChannelService {
     if (!userVoiceChannel) {
       this.logger.error('Usuário não está em nenhum canal')
       message.channel.send('É necessário está em um canal de voz')
-      return
+      throw new Error('É necessário está em um canal de voz')
     }
-    const guild = userVoiceChannel.guild
+    const guild = queue.getGuild()
 
     this.logger.info(`Entrando no canal: ${userVoiceChannel.name}`)
     const connection = joinVoiceChannel({
@@ -29,8 +31,19 @@ class ChannelService {
       adapterCreator: guild.voiceAdapterCreator
     })
 
-    this.queue.setVoiceChannel(connection)
-    this.queue.setStatus(StatusEnum.WAITING_MUSIC)
+    queue.setVoiceChannel(connection)
+    queue.setStatus(StatusEnum.WAITING_MUSIC)
+  }
+
+  setQueue(queue: QueueService) {
+    this.queue = queue
+  }
+
+  private getQueueOrThrow() {
+    if (!this.queue) {
+      throw new Error('Não possui queue')
+    }
+    return this.queue
   }
 }
 

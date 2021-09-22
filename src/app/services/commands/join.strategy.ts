@@ -9,6 +9,7 @@ class JoinStrategy extends AbstractCommand {
 
   async processMessage(message: Message) {
     this.logger.info('Acessando informações do canal')
+    this.channelService.setQueue(this.getQueue())
     this.channelService.joinChannel(message)
   }
 }

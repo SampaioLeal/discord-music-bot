@@ -7,6 +7,7 @@ class BomDiaStrategy extends AbstractCommand {
   private channelService = new ChannelService()
 
   async processMessage(message: Message) {
+    this.channelService.setQueue(this.getQueue())
     this.channelService.joinChannel(message)
     const ff = new PlayStrategy()
     this.getQueue().clearSongList()

@@ -2,16 +2,18 @@ import 'dotenv/config'
 import './app/utils/module-alias.util'
 import ClientService from '@app/services/client.service'
 import CommandsService from '@app/services/commands.service'
+import { Logger } from '@logger'
 
 const client = new ClientService()
-const commands = new CommandsService()
+const logger = new Logger('App')
 
-process.on('unhandledRejection', (error) => {
-  console.error('Unhandled promise rejection:', error)
+process.on('unhandledRejection', (error: any) => {
+  logger.error('Um error ocorreu:', error.stack)
 })
 
 client.login(() => {
   client.addEventOn('messageCreate', async (message) => {
-    commands.processMessage(message)
+    const commands = CommandsService.getInstance(message)
+    commands.processMessage()
   })
 })

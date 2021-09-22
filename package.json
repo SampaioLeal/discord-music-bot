@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node build/index.js",
-    "dev": "ts-node-dev --respawn src/index.ts --watch src",
+    "dev": "ts-node-dev --clear --respawn src/index.ts --watch src",
     "build": "rimraf ./build && npx tsc",
     "lint": "eslint . --ext .ts",
     "fix": "eslint . --ext .ts --fix",

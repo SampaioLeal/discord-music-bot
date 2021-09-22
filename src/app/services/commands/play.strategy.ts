@@ -5,14 +5,13 @@ import ytdl from 'ytdl-core'
 import ytsr from 'ytsr'
 import { makeCardMusic } from '@app/utils/card-messages.util'
 import ChannelService from '@app/services/channel.service'
-import PlayMusicService from '@app/services/play-music.service'
 
 class PlayStrategy extends AbstractCommand {
   private logger = new Logger(PlayStrategy.name)
   private channelService = new ChannelService()
-  private playMusicService = new PlayMusicService()
 
   async processMessage(message: Message) {
+    this.channelService.setQueue(this.getQueue())
     this.channelService.joinChannel(message)
     const result = await this.getYoutubeUrl(message.content)
 

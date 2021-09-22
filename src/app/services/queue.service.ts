@@ -11,9 +11,9 @@ import { CurrentSongData, SongData } from '@typings/queue.type'
 import { Null, Undefined } from '@typings/generic.type'
 import { StatusEnum } from '@app/enums/status.enum'
 import { Logger } from '@logger'
+import { ChannelData, Guild } from 'discord.js'
 
 class QueueService {
-  private static instance: QueueService
   private logger = new Logger(QueueService.name)
 
   private songs: SongData[]
@@ -23,8 +23,11 @@ class QueueService {
   private status: StatusEnum
   private elapsedTime = 0
   private timeCounter: Undefined<NodeJS.Timer>
+  private guild: Guild
+  private channel: Null<ChannelData> = null
 
-  private constructor() {
+  constructor(guild: Guild) {
+    this.guild = guild
     this.status = StatusEnum.IDLE
     this.stream = null
     this.songs = []
@@ -39,13 +42,6 @@ class QueueService {
         this.skip()
       }
     })
-  }
-
-  public static getInstance() {
-    if (!QueueService.instance) {
-      QueueService.instance = new QueueService()
-    }
-    return QueueService.instance
   }
 
   public getStatus() {
@@ -112,6 +108,7 @@ class QueueService {
         const resource = createAudioResource(stream)
 
         this.stream = stream
+        this.logger.info(`Tocando musica: ${currentSong.name}`)
         this.player.play(resource)
         this.status = StatusEnum.PLAYING
         this.timeCounter = setInterval(() => {
@@ -149,6 +146,10 @@ class QueueService {
 
   clearSongInQueue() {
     this.songs.splice(1)
+  }
+
+  getGuild() {
+    return this.guild
   }
 
   private resetTime() {
