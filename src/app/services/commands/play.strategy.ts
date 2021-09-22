@@ -36,12 +36,13 @@ class PlayStrategy extends AbstractCommand {
     const videoTitle = videoInfo.title
     const videoChannel = videoInfo.author.name
     const videoLengthSeconds = parseInt(videoInfo.lengthSeconds)
+    const totalMusicTime = this.getTotalMusicTime()
 
     const logMessage = makeCardMusic({
       title: videoTitle,
       musicUrl: url,
       positionInQueue: this.getQueue().getListSong().length + 1,
-      timeUntilPlaying: 0,
+      timeUntilPlaying: totalMusicTime,
       songDuration: videoLengthSeconds,
       youtubeChannelName: videoChannel,
       imageUrl: videoInfo.thumbnails[0].url,
@@ -61,6 +62,18 @@ class PlayStrategy extends AbstractCommand {
     return {
       embeds: [logMessage]
     }
+  }
+
+  private getTotalMusicTime() {
+    const queue = this.getQueue()
+    const listSong = [...queue.getListSong()]
+    const timeOfFirstMusic = queue.getCurrentSong()
+    listSong.shift()
+    return (
+      listSong.reduce((sum, data) => sum + data.duration, 0) +
+      timeOfFirstMusic.duration -
+      timeOfFirstMusic.elapsedTime
+    )
   }
 
   async getYoutubeUrl(text: string) {

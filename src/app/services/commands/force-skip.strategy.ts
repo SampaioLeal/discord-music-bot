@@ -1,13 +1,14 @@
 import AbstractCommand from '@app/services/commands/abstract-command.strategy'
-import { Message } from 'discord.js'
 
 class ForceSkipStrategy extends AbstractCommand {
-  async processMessage(message: Message) {
+  async processMessage() {
     const songList = this.getQueue().getListSong()
-    if (songList.length > 1) {
-      this.getQueue().skip()
-      message.channel.send(':fast_forward: Próxima música :thumbsup:')
-    }
+    this.getQueue().skip()
+    const msg =
+      songList.length > 0
+        ? ':fast_forward: Próxima música :thumbsup:'
+        : 'Não há mais músicas!'
+    this.sendMessage(msg)
   }
 }
 

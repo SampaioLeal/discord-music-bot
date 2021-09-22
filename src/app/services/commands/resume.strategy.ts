@@ -1,11 +1,10 @@
 import AbstractCommand from '@app/services/commands/abstract-command.strategy'
-import { Message } from 'discord.js'
 import { StatusEnum } from '@app/enums/status.enum'
 
 class ResumeStrategy extends AbstractCommand {
-  async processMessage(message: Message) {
+  async processMessage() {
     if (this.getQueue().getStatus() === StatusEnum.MUSIC_PAUSED) {
-      message.channel.send('Voltando a tocar')
+      this.sendMessage('Voltando a tocar')
       this.getQueue().resume()
     }
   }

@@ -13,7 +13,7 @@ class NowPlayingStrategy extends AbstractCommand {
       message.channel.send({ embeds: [logMessage] })
       return
     }
-    message.channel.send('Nenhuma música tocando no momento')
+    this.sendMessage('Nenhuma música tocando no momento')
   }
 }
 

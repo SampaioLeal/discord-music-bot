@@ -4,6 +4,7 @@ import { Message } from 'discord.js'
 class ClearStrategy extends AbstractCommand {
   async processMessage(message: Message) {
     this.getQueue().clearSongInQueue()
+    this.sendMessage('A lista de música foi limpa')
   }
 }
 

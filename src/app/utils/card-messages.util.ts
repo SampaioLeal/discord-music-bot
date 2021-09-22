@@ -3,6 +3,15 @@ import { CardMusic } from '@typings/card-message.type'
 import { CurrentSongData, SongData } from '@typings/queue.type'
 import { secondsToDisplayTime } from './converts.util'
 
+const makeCardMessage = (msg: string) => {
+  const logMessage: MessageEmbedOptions = {
+    description: msg,
+    color: '#b425d4'
+  }
+
+  return logMessage
+}
+
 const makeCardMusic = (data: CardMusic) => {
   const logMessage: MessageEmbedOptions = {
     title: data.title,
@@ -29,7 +38,7 @@ const makeCardMusic = (data: CardMusic) => {
       },
       {
         name: 'Estimado tocar em',
-        value: data.timeUntilPlaying.toString(),
+        value: secondsToDisplayTime(data.timeUntilPlaying),
         inline: true
       },
       {
@@ -69,7 +78,6 @@ const makeCardNowPlaying = (data: CurrentSongData) => {
 }
 
 const makeCardSongList = (data: SongData[], page = 0) => {
-  console.log('page', page, 'lenght', data.length)
   const pageSize = 10
   const description: string[] = [buildMusicDetail(data[0])]
   const amountPage = Math.ceil((data.length - 1) / pageSize)
@@ -78,8 +86,9 @@ const makeCardSongList = (data: SongData[], page = 0) => {
   if (page + 1 > amountPage) page = amountPage - 1
 
   data.shift()
-  data.splice(page * pageSize, pageSize).forEach((song, index) => {
-    description.push(buildMusicDetail(song, index))
+  const offset = page * pageSize
+  data.splice(offset, pageSize).forEach((song, index) => {
+    description.push(buildMusicDetail(song, index + offset))
   })
 
   description.push(
@@ -143,4 +152,4 @@ const buildProgressBar = (currentTime: number, endTime: number) => {
   return progressBar.join('')
 }
 
-export { makeCardMusic, makeCardNowPlaying, makeCardSongList }
+export { makeCardMusic, makeCardNowPlaying, makeCardSongList, makeCardMessage }

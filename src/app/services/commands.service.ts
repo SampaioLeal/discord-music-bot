@@ -13,6 +13,8 @@ import QueueStrategy from '@app/services/commands/queue.strategy'
 import ClearStrategy from '@app/services/commands/clear.strategy'
 import BomDiaStrategy from '@app/services/commands/bom-dia.strategy'
 import QueueService from '@app/services/queue.service'
+import RemoveMusicStrategy from '@app/services/commands/remove-music.strategy'
+import RepeatStrategy from '@app/services/commands/repeat.strategy'
 
 class CommandsService {
   private static instance: CommandsService
@@ -75,12 +77,15 @@ class CommandsService {
       dc: new DisconnectStrategy(),
       q: new QueueStrategy(),
       clear: new ClearStrategy(),
-      bomDia: new BomDiaStrategy()
+      bomDia: new BomDiaStrategy(),
+      rm: new RemoveMusicStrategy(),
+      repeat: new RepeatStrategy()
     }
     const strategy = commands[command]
     if (strategy) {
       this.logger.log(`Strategy [ ${command} ] encontrado`)
       strategy.setQueue(this.getQueueByGuild())
+      strategy.setMessage(this.message)
       return strategy
     }
 

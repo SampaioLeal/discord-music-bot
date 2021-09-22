@@ -6,7 +6,7 @@ class PauseStrategy extends AbstractCommand {
   async processMessage(message: Message) {
     if (this.getQueue().getStatus() === StatusEnum.PLAYING) {
       this.getQueue().pause()
-      message.channel.send('Musica pausada')
+      this.sendMessage('Musica pausada')
     }
   }
 }

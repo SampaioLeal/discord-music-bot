@@ -5,7 +5,6 @@ import { StatusEnum } from '@app/enums/status.enum'
 class DisconnectStrategy extends AbstractCommand {
   async processMessage(message: Message) {
     this.getQueue().disconnectVoice()
-    this.getQueue().setStatus(StatusEnum.IDLE)
   }
 }
 

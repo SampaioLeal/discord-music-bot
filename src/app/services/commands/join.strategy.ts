@@ -10,7 +10,12 @@ class JoinStrategy extends AbstractCommand {
   async processMessage(message: Message) {
     this.logger.info('Acessando informações do canal')
     this.channelService.setQueue(this.getQueue())
-    this.channelService.joinChannel(message)
+    const isJoin = this.channelService.joinChannel(message)
+    const channelName = message.member?.voice.channel?.name
+    const msg = isJoin
+      ? `Entrando no canal: ${channelName}`
+      : `Já estou no canal: ${channelName}`
+    this.sendMessage(msg)
   }
 }
 

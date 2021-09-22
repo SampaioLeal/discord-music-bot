@@ -11,7 +11,7 @@ class QueueStrategy extends AbstractCommand {
         embeds: [makeCardSongList(songlist, page)]
       })
     } else {
-      message.channel.send('Não há músicas')
+      this.sendMessage('Não há músicas')
     }
   }
 

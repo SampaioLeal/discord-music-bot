@@ -13,7 +13,7 @@ class ChannelService {
     const queue = this.getQueueOrThrow()
     if (queue.getStatus() !== StatusEnum.IDLE) {
       this.logger.warn('Já está em um canal')
-      return
+      return false
     }
 
     const userVoiceChannel = message.member?.voice.channel
@@ -33,6 +33,8 @@ class ChannelService {
 
     queue.setVoiceChannel(connection)
     queue.setStatus(StatusEnum.WAITING_MUSIC)
+
+    return true
   }
 
   setQueue(queue: QueueService) {

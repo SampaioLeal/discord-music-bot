@@ -11,20 +11,24 @@ import { CurrentSongData, SongData } from '@typings/queue.type'
 import { Null, Undefined } from '@typings/generic.type'
 import { StatusEnum } from '@app/enums/status.enum'
 import { Logger } from '@logger'
-import { ChannelData, Guild } from 'discord.js'
+import { Guild } from 'discord.js'
 
 class QueueService {
   private logger = new Logger(QueueService.name)
+
+  private timeCounter: Undefined<NodeJS.Timer>
+  private idleCounter: Undefined<NodeJS.Timer>
+
+  private elapsedTime = 0
+  private idleMaxTimeInSeconds = 60
 
   private songs: SongData[]
   private player: AudioPlayer
   private stream: Null<Readable>
   private voiceChannel: Undefined<VoiceConnection>
   private status: StatusEnum
-  private elapsedTime = 0
-  private timeCounter: Undefined<NodeJS.Timer>
   private guild: Guild
-  private channel: Null<ChannelData> = null
+  private repeatMode = false
 
   constructor(guild: Guild) {
     this.guild = guild
@@ -39,7 +43,12 @@ class QueueService {
 
     this.player.on('stateChange', (oldState, newState) => {
       if (oldState.status === 'playing' && newState.status === 'idle') {
-        this.skip()
+        if (!this.repeatMode) {
+          this.skip()
+        } else {
+          this.stop()
+          this.play()
+        }
       }
     })
   }
@@ -98,6 +107,7 @@ class QueueService {
   play() {
     if (this.status !== StatusEnum.PLAYING) {
       if (this.songs.length) {
+        this.resetIdleCounter()
         this.resetTime()
         const currentSong = this.songs[0]
         const stream = ytdl(currentSong.url, {
@@ -124,6 +134,7 @@ class QueueService {
         })
       } else {
         this.logger.info('A fila está vazia!')
+        this.startIdleCounter()
       }
     }
   }
@@ -144,12 +155,31 @@ class QueueService {
     this.player.unpause()
   }
 
+  toggleRepeatMode() {
+    this.repeatMode = !this.repeatMode
+  }
+
+  getRepeatMode() {
+    return this.repeatMode
+  }
+
   clearSongInQueue() {
     this.songs.splice(1)
   }
 
   getGuild() {
     return this.guild
+  }
+
+  private startIdleCounter() {
+    this.idleCounter = setTimeout(() => {
+      this.disconnectVoice()
+      this.logger.info('Desconectado por inatividade')
+    }, this.idleMaxTimeInSeconds * 1000)
+  }
+
+  private resetIdleCounter() {
+    if (this.idleCounter) clearInterval(this.idleCounter)
   }
 
   private resetTime() {
