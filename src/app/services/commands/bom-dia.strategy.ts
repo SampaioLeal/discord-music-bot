@@ -10,6 +10,7 @@ class BomDiaStrategy extends AbstractCommand {
     this.channelService.setQueue(this.getQueue())
     this.channelService.joinChannel(message)
     const ff = new PlayStrategy()
+    ff.setQueue(this.getQueue())
     this.getQueue().clearSongList()
     const logMessage = await ff.playMusic(
       'Bom dia',

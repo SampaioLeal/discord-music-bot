@@ -69,8 +69,8 @@ class QueueService {
   public disconnectVoice() {
     this.clearSongList()
     this.stop()
-    if (this.voiceChannel) return this.voiceChannel.disconnect()
     this.status = StatusEnum.IDLE
+    if (this.voiceChannel) return this.voiceChannel.disconnect()
   }
 
   public clearSongList() {
