@@ -11,6 +11,14 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@utils/*": ["src/utils/*"],
+      "@enums/*": ["src/enums/*"],
+      "@typings/*": ["src/typings/*"],
+      "@logger": ["src/logger/index"]
+    },
     "forceConsistentCasingInFileNames": true
   }
 }
