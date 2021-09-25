@@ -15,6 +15,8 @@ import BomDiaStrategy from '@app/services/commands/bom-dia.strategy'
 import QueueService from '@app/services/queue.service'
 import RemoveMusicStrategy from '@app/services/commands/remove-music.strategy'
 import RepeatStrategy from '@app/services/commands/repeat.strategy'
+import SEMStrategy from './commands/s&m.strategy'
+import MarombaStrategy from './commands/maromba.strategy'
 
 class CommandsService {
   private static instance: CommandsService
@@ -79,7 +81,9 @@ class CommandsService {
       clear: new ClearStrategy(),
       bomDia: new BomDiaStrategy(),
       rm: new RemoveMusicStrategy(),
-      repeat: new RepeatStrategy()
+      repeat: new RepeatStrategy(),
+      sampaio: new SEMStrategy(),
+      noveDaMatina: new MarombaStrategy()
     }
     const strategy = commands[command]
     if (strategy) {
