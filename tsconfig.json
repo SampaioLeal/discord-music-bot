@@ -5,7 +5,6 @@
     "module": "commonjs",
     "allowJs": true,
     "outDir": "build",
-    "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
@@ -13,11 +12,11 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/app/*"],
-      "@utils/*": ["src/utils/*"],
-      "@enums/*": ["src/enums/*"],
-      "@typings/*": ["src/typings/*"],
-      "@logger": ["src/logger/index"]
+      "@app/*": ["./src/app/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@enums/*": ["./src/enums/*"],
+      "@typings/*": ["./src/typings/*"],
+      "@logger": ["./src/logger/index"]
     },
     "forceConsistentCasingInFileNames": true
   }
