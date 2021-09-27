@@ -1,5 +1,4 @@
 import { ColorResolvable } from 'discord.js'
-import { Null } from '@typings/genericTypes'
 
 export interface CardMusic {
   title: string
@@ -9,6 +8,6 @@ export interface CardMusic {
   timeUntilPlaying: number
   positionInQueue: number
   color?: ColorResolvable
-  authorIconUrl: Null<string>
+  authorIconUrl: null | string
   imageUrl: string
 }

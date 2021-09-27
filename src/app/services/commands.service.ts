@@ -17,6 +17,7 @@ import RemoveMusicStrategy from '@app/services/commands/remove-music.strategy'
 import RepeatStrategy from '@app/services/commands/repeat.strategy'
 import SEMStrategy from './commands/s&m.strategy'
 import MarombaStrategy from './commands/maromba.strategy'
+import BemTeViStrategy from './commands/bem-te-vi.strategy'
 
 class CommandsService {
   private static instance: CommandsService
@@ -80,6 +81,7 @@ class CommandsService {
       q: new QueueStrategy(),
       clear: new ClearStrategy(),
       bomDia: new BomDiaStrategy(),
+      bemtevi: new BemTeViStrategy(),
       rm: new RemoveMusicStrategy(),
       repeat: new RepeatStrategy(),
       sampaio: new SEMStrategy(),

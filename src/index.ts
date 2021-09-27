@@ -8,7 +8,7 @@ const client = new ClientService()
 const logger = new Logger('App')
 
 process.on('unhandledRejection', (error: any) => {
-  logger.error('Um error ocorreu:', error.stack)
+  logger.error('Ocorreu um erro:', error.stack)
 })
 
 client.login(() => {
