@@ -6,7 +6,7 @@ class ForceSkipStrategy extends AbstractCommand {
     this.getQueue().skip()
     const msg =
       songList.length > 0
-        ? ':fast_forward: Próxima música :thumbsup:'
+        ? `:fast_forward: Próxima música - ${this.getQueue().getCurrentSong().name} :thumbsup:`
         : 'Não há mais músicas!'
     this.sendMessage(msg)
   }
